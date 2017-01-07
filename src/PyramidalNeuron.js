@@ -21,7 +21,7 @@ function PyramidalNeuron(){
 
 PyramidalNeuron.prototype.feedforward = function(source){
 
-  if(this.lastUpdated < SYNC.step){
+  if(this.lastUpdated < nLab.step){
     this.activeSources = []
     this.potential = 0
   }
@@ -32,13 +32,13 @@ PyramidalNeuron.prototype.feedforward = function(source){
   if(this.potential >= 1)
     this.activate()
 
-  this.lastUpdated = SYNC.step
+  this.lastUpdated = nLab.step
 
 }
 
 PyramidalNeuron.prototype.activate = function(){
 
-  if(this.lastActivated == SYNC.step)
+  if(this.lastActivated == nLab.step)
     return false
 
   this.growDendrites()
@@ -49,7 +49,7 @@ PyramidalNeuron.prototype.activate = function(){
   if(this.onActivation)
     this.onActivation(this)
 
-  this.lastActivated = SYNC.step
+  this.lastActivated = nLab.step
 
 }
 
@@ -129,6 +129,6 @@ PyramidalNeuron.prototype.appendTarget = function(dendrite){
 
 PyramidalNeuron.prototype.isActive = function(){
 
-  return this.lastActivated == SYNC.step
+  return this.lastActivated == nLab.step
 
 }

@@ -1,24 +1,12 @@
 
-var SYNC = {
-  step: 1
-}
+var feedforwardNeurons = nLab.create.PyramidalNeurons(8)
+var feedbackNeurons = nLab.create.PyramidalNeurons(8)
+var contextNeurons = nLab.create.PyramidalNeurons(8)
 
-var feedforwardNeurons = []
-for(var i = 0; i < 8; i++)
-feedforwardNeurons[i] = new PyramidalNeuron()
-
-var feedbackNeurons = []
-for(var i = 0; i < 8; i++)
-  feedbackNeurons[i] = new PyramidalNeuron()
-
-var contextNeurons = []
-for(var i = 0; i < 8; i++)
-  contextNeurons[i] = new PyramidalNeuron()
-
-var modelNeuron = new PyramidalNeuron()
-var feedforwardDendrite = new Dendrite(feedforwardNeurons,modelNeuron,0.8)
-var feedbackDendrite = new Dendrite(feedbackNeurons,modelNeuron,0.2)
-var contextDendrite = new Dendrite(contextNeurons,modelNeuron,0.2)
+var modelNeuron = nLab.create.PyramidalNeuron()
+var feedforwardDendrite = nLab.create.Dendrite(feedforwardNeurons,modelNeuron,0.8)
+var feedbackDendrite = nLab.create.Dendrite(feedbackNeurons,modelNeuron,0.2)
+var contextDendrite = nLab.create.Dendrite(contextNeurons,modelNeuron,0.2)
 
 nViz.settings({
   canvas: document.getElementById('canvas'),
@@ -32,7 +20,7 @@ nViz.animate({
   keyboardControl: true,
   render: function(){
 
-    SYNC.step++
+    nLab.next()
 
     for(var i = 0; i < feedforwardNeurons.length; i++)
       if(probable(80))
@@ -94,12 +82,14 @@ nViz.animate({
 
     nViz.render.distalDendrite({
       source: modelNeuron,
-      targets: feedbackNeurons
+      targets: feedbackNeurons,
+      showTargetDendriteActivity: true
     })
 
     nViz.render.distalDendrite({
       source: modelNeuron,
-      targets: contextNeurons
+      targets: contextNeurons,
+      showTargetDendriteActivity: true
     })
 
   }
