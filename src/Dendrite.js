@@ -1,5 +1,5 @@
 
-function Dendrite(sources,target,outputDepolization){
+function Dendrite(sources,target,outputDepolization,threshold){
 
   this.id = 'den-' + randomString(8)
 
@@ -8,7 +8,7 @@ function Dendrite(sources,target,outputDepolization){
   this.sourcesArray = []
   this.activeSources = []
 
-  this.threshold = 0.7
+  this.threshold = threshold || 0.7
   this.permananceThreshold = 0.4
   this.outputDepolization = outputDepolization || 1
   this.synapseDecay = 0.001
@@ -78,10 +78,10 @@ Dendrite.prototype.resetPermanances = function(){
 
 }
 
-Dendrite.prototype.randomizePermanances = function(){
+Dendrite.prototype.randomizePermanances = function(min,max){
 
   for(var i in this.sources)
-    this.sources[i] = Math.random()
+    this.sources[i] = randomInt((min || 0)*10,(max || 1)*10) / 10
 
 }
 
@@ -99,5 +99,17 @@ Dendrite.prototype.getPermanances = function(){
   }
 
   return permanances
+
+}
+
+Dendrite.prototype.getSources = function(){
+
+  return this.sourcesArray
+
+}
+
+Dendrite.prototype.getTarget = function(){
+
+  return this.target
 
 }

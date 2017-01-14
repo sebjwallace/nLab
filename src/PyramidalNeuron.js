@@ -8,8 +8,10 @@ function PyramidalNeuron(){
   this.sourcesIndeces = {}
   this.activeSources = []
 
-  this.neighbors = []
-  this.neighborsIndeces = {}
+  this.lateralNeighbors = []
+  this.lateralNeighborsIndeces = {}
+  this.proximalNeighbors = []
+  this.proximalNeighborsIndeces = {}
 
   this.potential = 0
   this.influenceFactor = 0.5
@@ -29,8 +31,9 @@ PyramidalNeuron.prototype.feedforward = function(source){
   this.activeSources.push(source)
   this.potential += source.outputDepolization
 
-  if(this.potential >= 1)
-    this.activate()
+  if(this.potential >= 1 && this.lastActivated != nLab.step)
+    this.inhibitLateralNeighbors()
+  nLab.registerDepolarizedCell(this)
 
   this.lastUpdated = nLab.step
 
@@ -75,21 +78,27 @@ PyramidalNeuron.prototype.backpropagate = function(){
 
 }
 
-PyramidalNeuron.prototype.inhibit = function(){
+PyramidalNeuron.prototype.inhibit = function(factor){
 
-  for(var i = 0; i < this.neighbors.length; i++)
-    this.neighbors[i].influence(-(this.potential * this.influenceFactor))
+  this.potential -= factor
+
+}
+
+PyramidalNeuron.prototype.inhibitLateralNeighbors = function(){
+
+  for(var i = 0; i < this.lateralNeighbors.length; i++)
+    this.lateralNeighbors[i].inhibit(this.potential * this.influenceFactor)
 
 }
 
 PyramidalNeuron.prototype.growDendrites = function(){
 
   var sources = []
-  var max = randomInt(this.neighbors.length/4,this.neighbors.length)
-  max = this.neighbors.length ? 0 : max
+  var max = randomInt(this.proximalNeighbors.length/4,this.proximalNeighbors.length)
+  max = this.proximalNeighbors.length ? 0 : max
 
   for(var i = 0; i < max; i++){
-    var cell = this.neighbors[randomInt(0,this.neighbors.length-1)]
+    var cell = this.proximalNeighbors[randomInt(0,this.proximalNeighbors.length-1)]
     sources.push(cell)
   }
 
@@ -97,20 +106,20 @@ PyramidalNeuron.prototype.growDendrites = function(){
 
 }
 
-PyramidalNeuron.prototype.appendNeighbor = function(cell){
+PyramidalNeuron.prototype.appendNeighbor = function(type,cell){
 
   if(!cell) return false
   if(!cell.id || cell.id == this.id) return false
 
-  this.neighbors.push(cell)
-  this.neighborsIndeces[cell.id] = cell
+  this[type+'Neighbors'].push(cell)
+  this[type+'NeighborsIndeces'][cell.id] = cell
 
 }
 
-PyramidalNeuron.prototype.appendNeighbors = function(cells){
+PyramidalNeuron.prototype.appendNeighbors = function(type,cells){
 
   for(var i = 0; i < cells.length; i++)
-    this.appendNeighbor(cells[i])
+    this.appendNeighbor(type,cells[i])
 
 }
 
@@ -130,5 +139,11 @@ PyramidalNeuron.prototype.appendTarget = function(dendrite){
 PyramidalNeuron.prototype.isActive = function(){
 
   return this.lastActivated == nLab.step
+
+}
+
+PyramidalNeuron.prototype.getInhibitionTargets = function(){
+
+  return this.lateralNeighbors
 
 }
